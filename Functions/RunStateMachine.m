@@ -26,10 +26,6 @@ end
 usingBonsai = 0;
 if ~isempty(BpodSystem.BonsaiSocket)
     usingBonsai = 1;
-    BonsaiBytesAvailable = BpodSystem.BonsaiSocket.bytesAvailable;
-    if BonsaiBytesAvailable > 0
-        BpodSystem.BonsaiSocket.read(BonsaiBytesAvailable, 'uint8');
-    end
 end
 if sum(BpodSystem.Modules.RelayActive) > 0
     BpodSystem.StopModuleRelay();
@@ -100,8 +96,8 @@ BpodSystem.RefreshGUI;
 BpodSystem.Status.InStateMatrix = 1;
 while BpodSystem.Status.InStateMatrix
     if usingBonsai
-        if BpodSystem.BonsaiSocket.bytesAvailable() > 15
-            OscMsg = BpodSystem.BonsaiSocket.read(16, 'uint8');
+        OscMsg = UDPCom_read(BpodSystem.BonsaiSocket, 'uint8');
+        if ~isempty(OscMsg)
             BonsaiByte = OscMsg(end);
             if BpodSystem.EmulatorMode == 0
                 SendBpodSoftCode(BonsaiByte);
@@ -381,7 +377,7 @@ TimeString = [num2str(H) ':' MPad num2str(M) ':' SPad num2str(S)];
 
 function HandleSoftCode(SoftCode)
 global BpodSystem
-eval([BpodSystem.SoftCodeHandlerFunction '(' num2str(SoftCode) ')'])
+UDPCom_write(BpodSystem.BonsaiSocketClient, SoftCode)
 
 function ManualOverrideEvent = VirtualManualOverride(OverrideMessage)
 % Converts the byte code transmission formatted for the state machine into event codes
@@ -414,3 +410,12 @@ elseif OpCode == '~'
 else
     ManualOverrideEvent = [];
 end
+
+function Msg = UDPCom_read(UDPObj, format)
+sz = pnet(UDPObj,'readpacket', 16, 'noblock');
+Msg = pnet(UDPObj,'read' , sz, format);
+
+function UDPCom_write(UDPObj, Msg)
+Msg = packosc('/Bpod','i', uint8(Msg));
+pnet(UDPObj,'write', Msg, 'uint8');
+pnet(UDPObj, 'writepacket', 'localhost', UDPObj.Port);
