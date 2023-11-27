@@ -79,8 +79,6 @@ if ~isempty(BpodSystem)
         BpodSystem.SerialPort = [];
         BpodSystem.AnalogSerialPort = [];
         clear global BpodSystem
-        pnet('closeall');
-        disp('UDP connections are closed.')
     else
         msgbox('There is a running protocol. Please stop it first.')
         BpodErrorSound;

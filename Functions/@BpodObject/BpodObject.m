@@ -53,8 +53,7 @@ classdef BpodObject < handle
         CalibrationTables % Struct for liquid, sound, etc.
         BlankStateMachine % Holds a blank state machine to use with AddState().
         ProtocolStartTime % The time when the current protocol was started.
-        BonsaiSocket % An object containing a UDP socket for communication with Bonsai
-        BonsaiSocketClient % An object containing a UDP socket for communication with Bonsai
+        BonsaiSocket % An object containing a TCP/IP socket for communication with Bonsai
         EmulatorMode % 0 if actual device connected, 1 if emulator
         HostOS % Holds a string naming the host operating system (i.e. 'Microsoft Windows XP')
         Timers % A struct containing MATLAB timer objects
