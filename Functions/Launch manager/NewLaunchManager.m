@@ -119,14 +119,16 @@ else
     % Set selected protocol to first non-folder item
     ProtocolNames = get(BpodSystem.GUIHandles.ProtocolSelector, 'String');
     SelectedProtocol = 1;
-    for i = 1:length(ProtocolNames)
-        ThisProtocolName = ProtocolNames{i};
-        if ThisProtocolName(1) == '<'
-            SelectedProtocol = i+1;
-        end
-    end
+%     for i = 1:length(ProtocolNames)
+%         ThisProtocolName = ProtocolNames{i};
+%         if ThisProtocolName(1) == '<'
+%             SelectedProtocol = i+1;
+%         end
+%     end
     set(BpodSystem.GUIHandles.ProtocolSelector, 'Value', SelectedProtocol);
     SelectedProtocolName = ProtocolNames{SelectedProtocol};
+    if strcmp(SelectedProtocolName(1), '<'), SelectedProtocolName(1) = []; end
+    if strcmp(SelectedProtocolName(end), '>'), SelectedProtocolName(end) = []; end
     BpodSystem.Status.CurrentProtocolName = SelectedProtocolName;
     DataPath = fullfile(BpodSystem.Path.DataFolder,BpodSystem.GUIData.DummySubjectString);
     ProtocolName = BpodSystem.Status.CurrentProtocolName;
