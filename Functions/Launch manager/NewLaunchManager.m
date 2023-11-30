@@ -214,6 +214,10 @@ if isNewFolder
 else
     BpodSystem.GUIData.ProtocolSelectorLastValue = currentValue;
 end
+if isfield(BpodSystem.GUIData,'SessionID') || ~isempty(BpodSystem.GUIData.SessionID)
+    AutoSelectSubject();
+end
+
 
 
 function SubjectSelectorNavigate (a,b)
@@ -884,3 +888,38 @@ else
     BpodSystem.GUIData.SessionID = answer{2};
 end
 
+
+function AutoSelectSubject()
+global BpodSystem
+NameList = get(BpodSystem.GUIHandles.SubjectSelector, 'String');
+Selected = get(BpodSystem.GUIHandles.SubjectSelector, 'Value');
+if iscell(NameList)
+    for x = 1:length(NameList)
+        if strcmp(NameList{x}, BpodSystem.GUIData.SubjectID)
+            Selected = x;
+        end
+    end
+    SelectedName = NameList{Selected};
+else
+    SelectedName = NameList;
+end
+ProtocolList = get(BpodSystem.GUIHandles.ProtocolSelector, 'String');
+SelectedProtocol = get(BpodSystem.GUIHandles.ProtocolSelector, 'Value');
+ProtocolName = ProtocolList{SelectedProtocol};
+SettingsPath = fullfile(BpodSystem.Path.DataFolder,SelectedName,BpodSystem.GUIData.SessionID,'Session Settings');
+Candidates = dir(SettingsPath);
+nSettingsFiles = 0;
+SettingsFileNames = cell(1);
+for x = 3:length(Candidates)
+    Extension = Candidates(x).name;
+    Extension = Extension(length(Extension)-2:length(Extension));
+    if strcmp(Extension, 'mat')
+        nSettingsFiles = nSettingsFiles + 1;
+        Name = Candidates(x).name;
+        SettingsFileNames{nSettingsFiles} = Name(1:end-4);
+    end
+end
+set(BpodSystem.GUIHandles.SettingsSelector, 'String', SettingsFileNames);
+set(BpodSystem.GUIHandles.SettingsSelector, 'Value', 1);
+BpodSystem.Status.CurrentSubjectName = SelectedName;
+UpdateDataFile(ProtocolName, SelectedName);
