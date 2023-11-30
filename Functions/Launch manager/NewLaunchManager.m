@@ -118,16 +118,14 @@ elseif isempty(BpodSystem.Path.DataFolder)
     close(BpodSystem.GUIHandles.LaunchManagerFig);
 else
     loadProtocols;
-    BpodSystem.GUIData.DummySubjectString = 'FakeSubject';
+    if ~isfield(BpodSystem.GUIData,'SessionID') || isempty(BpodSystem.GUIData.SessionID)
+        BpodSystem.GUIData.DummySubjectString = 'FakeSubject';
+    else
+        BpodSystem.GUIData.DummySubjectString = [];
+    end
     % Set selected protocol to first non-folder item
     ProtocolNames = get(BpodSystem.GUIHandles.ProtocolSelector, 'String');
     SelectedProtocol = 1;
-%     for i = 1:length(ProtocolNames)
-%         ThisProtocolName = ProtocolNames{i};
-%         if ThisProtocolName(1) == '<'
-%             SelectedProtocol = i+1;
-%         end
-%     end
     set(BpodSystem.GUIHandles.ProtocolSelector, 'Value', SelectedProtocol);
     SelectedProtocolName = ProtocolNames{SelectedProtocol};
     if strcmp(SelectedProtocolName(1), '<'), SelectedProtocolName(1) = []; end
@@ -159,8 +157,10 @@ else
         save(DefaultSettingsFilePath, 'ProtocolSettings')
     end
     loadSubjects(ProtocolName);
-    loadSettings(ProtocolName, BpodSystem.GUIData.DummySubjectString);
-    UpdateDataFile(ProtocolName, BpodSystem.GUIData.DummySubjectString);
+    if ~isfield(BpodSystem.GUIData,'SessionID') || isempty(BpodSystem.GUIData.SessionID)
+        loadSettings(ProtocolName, BpodSystem.GUIData.DummySubjectString);
+        UpdateDataFile(ProtocolName, BpodSystem.GUIData.DummySubjectString);
+    end
     BpodSystem.GUIData.ProtocolSelectorLastValue = 1;
 end
 
@@ -186,7 +186,11 @@ else
     ProtocolName = String{currentValue};
     if ProtocolName(1) ~= '<'
         % Make sure a default settings file exists
-        SettingsFolder = fullfile(BpodSystem.Path.DataFolder,BpodSystem.GUIData.DummySubjectString,ProtocolName, 'Session Settings');
+        if ~isfield(BpodSystem.GUIData,'SessionID') || isempty(BpodSystem.GUIData.SessionID)
+            SettingsFolder = fullfile(BpodSystem.Path.DataFolder,BpodSystem.GUIData.DummySubjectString,ProtocolName, 'Session Settings');
+        else
+            SettingsFolder = fullfile(BpodSystem.Path.DataFolder,BpodSystem.GUIData.SubjectID, BpodSystem.GUIData.SessionID, 'Session Settings');
+        end
         if ~exist(SettingsFolder)
             mkdir(SettingsFolder);
         end
@@ -198,8 +202,10 @@ else
         end
 
         loadSubjects(ProtocolName);
-        loadSettings(ProtocolName, BpodSystem.GUIData.DummySubjectString);
-        UpdateDataFile(ProtocolName, BpodSystem.GUIData.DummySubjectString);
+        if ~isfield(BpodSystem.GUIData,'SessionID') || isempty(BpodSystem.GUIData.SessionID)
+            loadSettings(ProtocolName, BpodSystem.GUIData.DummySubjectString);
+            UpdateDataFile(ProtocolName, BpodSystem.GUIData.DummySubjectString);
+        end
         BpodSystem.Status.CurrentProtocolName = ProtocolName;
     end
 end
@@ -298,11 +304,20 @@ global BpodSystem
 CandidateSubjects = dir(BpodSystem.Path.DataFolder);
 SubjectNames = cell(1);
 nSubjects = 1;
-SubjectNames{1} = BpodSystem.GUIData.DummySubjectString;
+if ~isfield(BpodSystem.GUIData,'SessionID') || isempty(BpodSystem.GUIData.SessionID)
+    SubjectNames{1} = BpodSystem.GUIData.DummySubjectString;
+else
+    SubjectNames{1} = BpodSystem.GUIData.SubjectID;
+end
 for x = 1:length(CandidateSubjects)
     if x > 2
         if CandidateSubjects(x).isdir
-            if ~strcmp(CandidateSubjects(x).name, BpodSystem.GUIData.DummySubjectString)
+            if ~isfield(BpodSystem.GUIData,'SessionID') || isempty(BpodSystem.GUIData.SessionID)
+                is_duplet = strcmp(CandidateSubjects(x).name, BpodSystem.GUIData.DummySubjectString);
+            else
+                is_duplet = strcmp(CandidateSubjects(x).name, BpodSystem.GUIData.SubjectID);
+            end
+            if ~is_duplet
                 if ~isfield(BpodSystem.GUIData,'SessionID') || isempty(BpodSystem.GUIData.SessionID)
                     Testpath = fullfile(BpodSystem.Path.DataFolder,CandidateSubjects(x).name,ProtocolName);
                 else
