@@ -60,10 +60,9 @@ else
         end
         TE.Info.Modules = BpodSystem.Modules;
     end
-    TE.Info.SessionDate = datestr(now, 1);
-    TheTime = now;
-    TE.Info.SessionStartTime_UTC = datestr(TheTime, 13);
-    TE.Info.SessionStartTime_MATLAB = TheTime;
+    TE.Info.SessionDate = datetime('now', 'Format', 'yyyy-MM-dd');
+    TE.Info.SessionStartTime_UTC = datetime('now', 'Format', 'HH:mm:ss.SSS');
+    TE.Info.SessionStartTime_MATLAB = now;
 end
 TE.nTrials = TrialNum;
 %% Parse and add raw events for this trial
