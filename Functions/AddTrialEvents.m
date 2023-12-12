@@ -60,8 +60,8 @@ else
         end
         TE.Info.Modules = BpodSystem.Modules;
     end
-    TE.Info.SessionDate = datetime('now', 'Format', 'yyyy-MM-dd');
-    TE.Info.SessionStartTime_UTC = datetime('now', 'Format', 'HH:mm:ss.SSS');
+    TE.Info.SessionDate = string(datetime('now', 'Format', 'yyyy-MM-dd'));
+    TE.Info.SessionStartTime_UTC = string(datetime('now', 'Format', 'HH:mm:ss.SSS'));
     TE.Info.SessionStartTime_MATLAB = now;
 end
 TE.nTrials = TrialNum;
