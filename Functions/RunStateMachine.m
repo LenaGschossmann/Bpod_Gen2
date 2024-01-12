@@ -52,7 +52,7 @@ if BpodSystem.EmulatorMode == 0
     end
     TrialStartTimestampBytes = BpodSystem.SerialPort.read(8, 'uint8');
     TrialStartTimestamp = double(typecast(TrialStartTimestampBytes, 'uint64'))/1000000; % Start-time of the trial in microseconds (compensated for 32-bit clock rollover)
-    TrialStartTimestampOS = char(datetime('now', 'Format', 'HH:mm:ss.SSS'));
+    % TrialStartTimestampOS = char(datetime('now', 'Format', 'HH:mm:ss.SSS'));
 end
 BpodSystem.StateMatrix = BpodSystem.StateMatrixSent;
 EventNames = BpodSystem.StateMachineInfo.EventNames;
