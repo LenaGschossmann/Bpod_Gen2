@@ -1,3 +1,45 @@
+---v1.8.0---
+-Analog Input Module: Added control of DIO channels as outputs (requires firmware update)
+-Analog Output Module: Revised serial interface to disentangle two parameters (requires firmware update)
+-Added BpodFormatMidroSD.m, an in-situ formatting tool for microSD cards on Bpod modules
+-LaunchManager: A Bpod protcol folder can now contain only folders (bug fix contributed by Austin Pauley @ FSU)
+-LiveOutcomePlot: Fixed a bug where plot would crash on final trial of session if not ended by the user
+-BpodPhoneHome: Disabled returning metadata to Sanworks on rigs that have opted in for sessions started with LaunchManager
+-LoadBpodFirmware: Added support for filtering firmware list by hardware version
+-LoadModules: Added hardware version filter to LoadBpodFirmware link in command window
+-BpodSystemInfo (GUI panel via mangifying glass icon): Fixed display of state machine model for r2.5
+
+---v1.7.9---
+-Code quality: Improved comments, case conventions and line width across the repository. User-facing names were preserved.
+-Firmware: Added binary for firmware v22 on State Machine r2.5
+-Added LiveOutcomePlot, a new class that replaces SideOutcomePlot and TrialTypeOutcomePlot.
+-Example protocols: Updated all protocols to use LiveOutcomePlot.
+-Bpod.m: Added handling of case where a global BpodSystem variable already exists on startup
+-USB Serial port discovery: updated routine to look for and use MATLAB built-ins before resorting to system calls
+-Folder structure: Simplified repository structure with minor reorganization.
+-AddTrialEvents: Added OS and MATLAB version information to the data structure returned by AddTrialEvents.
+
+---v1.7.8---
+-Switched to semantic versioning. Previously Github release tags used semantic, but software displayed version as X.XX
+-Automatic Sound Calibration: Fixed support for Measurement Computing USB1608G
+-Automatic Sound Calibration: Fixed test tone GUI (previously crashed on open)
+-Sound Calibration: Replaced polynomial fits with piecewise interpolation: griddedInterpolant with 'pchip'
+-HiFi Module: Updated firmware to v5. This fixes an issue: setting sampling rate would reset digital attenuation to default.
+-RotaryEncoderModule: Fixed a bug where using readCurrentPosition() during USB streaming could cause a crash
+-Added Bpod test suite with several key state machine performance tests
+-Bpod.m: Improvements to comments and code style.
+-ArCOM: Fixed baud rate crash on Ubuntu 20.04
+-AddTrialEvents: Bpod software version is now included in data Info field.
+-Updated copyright notices
+
+---v1.77---
+-EndBpod: Fixed bug introduced in v1.76 affecting MATLAB r2016a or older that could cause a crash on application close. 
+-Splash Screen: Improved display on MATLAB v8 and older
+-PsychToolboxAudio: fixed performance with Bpod emulator (contributed by github/ogeesan)
+-Moved Python module classes to github.com/sanworks/PyBpod2
+-Updated contributor guidelines
+-Added code of conduct
+
 ---v1.76---
 -BControl: Updated patch to work with firmware v23
 -Bonsai: Added example code for direct USB transactions with state machine via its APP port

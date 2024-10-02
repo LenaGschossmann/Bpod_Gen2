@@ -1,6 +1,6 @@
 # Bpod MATLAB Software Repository
 
-<img align="right" src="Assets/Bitmap/Bpod_Welcome.jpg" width="350px">Bpod is an open source platform for rodent behavior measurement and real-time stimulus control. Bpod is actively developed and maintained by [Sanworks LLC](https://sanworks.io/).
+<img align="right" src="Assets/Bitmap/Bpod_Welcome.jpg" width="350px">Bpod is an open source platform for animal behavior measurement and real-time stimulus control. Bpod is actively developed and maintained by [Sanworks LLC](https://sanworks.io/).
 
 ## Wiki
 
@@ -23,7 +23,7 @@ This repository includes:
 * See the wiki (above) for more info
 
 ## Contributions ##
-* Please note the guidelines given [here](/CONTRIBUTING%20README.txt).
+* Please note the guidelines given [here](/CONTRIBUTING.md).
 
 ## Companion Repositories ##
 * [Bpod Firmware](https://sanworks.github.io/Bpod_Wiki/install-and-update/firmware-repo-list/)<br>

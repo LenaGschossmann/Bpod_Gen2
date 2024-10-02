@@ -1,8 +1,9 @@
-% Example state matrix using the '_back_' command to return to the previous state. 
+% Example state machine description using the '>back' command to return to the previous state. 
 % Entry to port 1 lights up port 1 for 1 second. 
 % Entry to port 2 lights up port 2 for 1 second.
 % Both states go to "waiting". Entry to port 1 or 2 exits. Entry to port 3
 % sends the SM back to the previous state (flash port 1 or 2, depending on which it was).
+% Requires: behavior ports or lickometers with visible LEDs connected to Ch1, Ch2 and Ch3
 
 sma = NewStateMachine;
 
