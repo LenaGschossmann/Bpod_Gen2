@@ -89,7 +89,8 @@ SoundCalibrationManager;
 function configure_bonsai(~,~)
 global BpodSystem
 close(BpodSystem.GUIHandles.SettingsMenuFig)
-ConfigureBonsaiSocket;
+% ConfigureBonsaiSocket;
+ConfigureBonsaiSocket_2WayUDP;
 
 function configure_ports(~,~)
 global BpodSystem
