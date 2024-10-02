@@ -2,7 +2,7 @@
 ----------------------------------------------------------------------------
 
 This file is part of the Sanworks Bpod repository
-Copyright (C) 2017 Sanworks LLC, Stony Brook, New York, USA
+Copyright (C) Sanworks LLC, Rochester, New York, USA
 
 ----------------------------------------------------------------------------
 
@@ -17,6 +17,10 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %}
+
+% SaveProtocolSettings() saves the ProtocolSettings struct to the currently
+% selected protocol settings file.
+
 function SaveProtocolSettings(ProtocolSettings)
-global BpodSystem
+global BpodSystem % Import the global BpodSystem object
 save(BpodSystem.Path.Settings, 'ProtocolSettings');
