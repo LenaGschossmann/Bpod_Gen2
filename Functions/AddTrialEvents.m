@@ -152,6 +152,7 @@ sd.RawData.OriginalEventTimestamps{trialNum} = rawTrialEvents.EventTimestamps;
 
 % Add trial start/end timestamps
 sd.TrialStartTimestamp(trialNum) = rawTrialEvents.TrialStartTimestamp;
+% sd.TrialStartTimestampOS{trialNum} = rawTrialEvents.TrialStartTimestampOS; % added by LJG, 10/2024
 sd.TrialEndTimestamp(trialNum) = rawTrialEvents.TrialEndTimestamp;
 
 % Add error codes
