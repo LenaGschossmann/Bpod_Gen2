@@ -132,6 +132,9 @@ BpodSystem.GUIHandles.DataFileDisplay = text(20, 730,'', 'FontName', 'Courier Ne
 BpodSystem.GUIHandles.DataFileLabel = text(20, 710,'Data File:', 'FontName', 'Arial', 'FontSize', pathFontSize,... 
                                       'Color', [1 1 1], 'Interpreter', 'None');
 
+% Ask for Subjec & Session ID
+GetSubjectSessionID();
+
 %% Populate UI
 if isfield(BpodSystem.SystemSettings, 'ProtocolFolder')
     BpodSystem.Path.ProtocolFolder = BpodSystem.SystemSettings.ProtocolFolder;
@@ -168,6 +171,7 @@ else
         % Reset to first item in list
         selectedProtocol = 1;
         set(BpodSystem.GUIHandles.ProtocolSelector, 'Value', selectedProtocol);
+        BpodSystem.GUIData.ProtocolSelectorLastValue = 1; % LJG 10/2024
         return;
     end
 
@@ -248,6 +252,11 @@ protocolName = protocolList{selectedProtocol};
 nameList = get(BpodSystem.GUIHandles.SubjectSelector, 'String');
 selected = get(BpodSystem.GUIHandles.SubjectSelector, 'Value');
 if iscell(nameList)
+    for x = 1:length(nameList)
+        if strcmp(nameList{x}, BpodSystem.GUIData.SubjectID)
+            selected = x;
+        end
+    end
     selectedName = nameList{selected};
 else
     selectedName = nameList;
@@ -324,12 +333,20 @@ global BpodSystem % Import the global BpodSystem object
 candidateSubjects = dir(BpodSystem.Path.DataFolder);
 subjectNames = cell(1);
 nSubjects = 1;
-subjectNames{1} = BpodSystem.GUIData.DummySubjectString;
+if ~isfield(BpodSystem.GUIData,'SessionID') || isempty(BpodSystem.GUIData.SessionID)
+    subjectNames{1} = BpodSystem.GUIData.DummySubjectString;
+else
+    subjectNames{1} = BpodSystem.GUIData.SubjectID;
+end
 for x = 1:length(candidateSubjects)
     if x > 2
         if candidateSubjects(x).isdir
             if ~strcmp(candidateSubjects(x).name, BpodSystem.GUIData.DummySubjectString)
-                testpath = fullfile(BpodSystem.Path.DataFolder,candidateSubjects(x).name,ProtocolName);
+                if ~isfield(BpodSystem.GUIData,'SessionID') || isempty(BpodSystem.GUIData.SessionID)
+                    testpath = fullfile(BpodSystem.Path.DataFolder,candidateSubjects(x).name,ProtocolName);
+                else
+                    testpath = fullfile(BpodSystem.Path.DataFolder,candidateSubjects(x).name,BpodSystem.GUIData.SessionID);
+                end                
                 if exist(testpath) == 7
                     nSubjects = nSubjects + 1;
                     subjectNames{nSubjects} = candidateSubjects(x).name;
@@ -343,7 +360,11 @@ set(BpodSystem.GUIHandles.SubjectSelector,'Value',1);
 
 function loadSettings(ProtocolName, SubjectName)
 global BpodSystem % Import the global BpodSystem object
-settingsPath = fullfile(BpodSystem.Path.DataFolder, SubjectName, ProtocolName, 'Session Settings');
+if ~isfield(BpodSystem.GUIData,'SessionID') || isempty(BpodSystem.GUIData.SessionID)
+    settingsPath = fullfile(BpodSystem.Path.DataFolder, SubjectName, ProtocolName, 'Session Settings');
+else
+    settingsPath = fullfile(BpodSystem.Path.DataFolder, BpodSystem.GUIData.SubjectID, BpodSystem.GUIData.SessionID, 'Session Settings');
+end
 candidates = dir(settingsPath);
 nSettingsFiles = 0;
 settingsFileNames = cell(1);
@@ -364,11 +385,19 @@ global BpodSystem % Import the global BpodSystem object
 dateInfo = datestr(now, 30);
 dateInfo(dateInfo == 'T') = '_';
 localDir = BpodSystem.Path.DataFolder(max(find(BpodSystem.Path.DataFolder(1:end-1) == filesep)+1):end);
-set(BpodSystem.GUIHandles.DataFilePathDisplay, 'String',... 
+if ~isfield(BpodSystem.GUIData,'SessionID') || isempty(BpodSystem.GUIData.SessionID)
+    set(BpodSystem.GUIHandles.DataFilePathDisplay, 'String',... 
     [filesep fullfile(localDir, subjectName, protocolName, 'Session Data') filesep],'interpreter','none');
+else
+    set(BpodSystem.GUIHandles.DataFilePathDisplay, 'String', [filesep fullfile(localDir, BpodSystem.GUIData.SubjectID, BpodSystem.GUIData.SessionID, 'Session Data') filesep],'interpreter','none');
+end
 fileName = [subjectName '_' protocolName '_' dateInfo '.mat'];
 set(BpodSystem.GUIHandles.DataFileDisplay, 'String', fileName);
-BpodSystem.Path.CurrentDataFile = fullfile(BpodSystem.Path.DataFolder, subjectName, protocolName, 'Session Data', fileName);
+if ~isfield(BpodSystem.GUIData,'SessionID') || isempty(BpodSystem.GUIData.SessionID)
+    BpodSystem.Path.CurrentDataFile = fullfile(BpodSystem.Path.DataFolder, subjectName, protocolName, 'Session Data', fileName);
+else
+    BpodSystem.Path.CurrentDataFile = fullfile(BpodSystem.Path.DataFolder, BpodSystem.GUIData.SubjectID, BpodSystem.GUIData.SessionID, 'Session Data', fileName);
+end
 
 function add_subject(a,b)
 global BpodSystem % Import the global BpodSystem object
@@ -405,7 +434,12 @@ if ~isempty(newName)
 
     % Check to see if subject already exists
     protocolName = BpodSystem.Status.CurrentProtocolName;
-    testpath = fullfile(BpodSystem.Path.DataFolder,newName);
+    if ~isfield(BpodSystem.GUIData,'SessionID') || isempty(BpodSystem.GUIData.SessionID)
+        testpath = fullfile(BpodSystem.Path.DataFolder,newName);
+    else
+        testpath = fullfile(BpodSystem.Path.DataFolder, BpodSystem.GUIData.SubjectID, BpodSystem.GUIData.SessionID);
+    end
+    
     testpath2 = fullfile(testpath,protocolName);
     newAnimal = 0;
     if exist(testpath) ~= 7
@@ -526,7 +560,11 @@ end
 subjectName = subjectNameList{subjectNameValue};
 % Check to see if subject already exists
 protocolName = BpodSystem.Status.CurrentProtocolName;
-testpath = fullfile(BpodSystem.Path.DataFolder,subjectName,protocolName,'Session Settings',[newSettingsName '.mat' ]);
+if ~isfield(BpodSystem.GUIData,'SessionID') || isempty(BpodSystem.GUIData.SessionID)
+    testpath = fullfile(BpodSystem.Path.DataFolder,subjectName,protocolName,'Session Settings',[newSettingsName '.mat' ]);
+else
+    testpath = fullfile(BpodSystem.Path.DataFolder,BpodSystem.GUIData.SubjectID, BpodSystem.GUIData.SessionID, 'Session Settings',[newSettingsName '.mat' ]);
+end
 if exist(testpath) == 0
     settingsPath = testpath;
     ProtocolSettings = struct;
@@ -565,8 +603,12 @@ selectedProtocolName = protocolNames{selectedProtocol};
 subjectList = get(BpodSystem.GUIHandles.SubjectSelector,'String');
 subjectIndex = get(BpodSystem.GUIHandles.SubjectSelector,'Value');
 selectedSubjectName = subjectList{subjectIndex};
-settingsFile = fullfile(BpodSystem.Path.DataFolder, selectedSubjectName, selectedProtocolName, 'Session Settings',... 
-                       [selectedSettingsName '.mat']);
+if ~isfield(BpodSystem.GUIData,'SessionID') || isempty(BpodSystem.GUIData.SessionID)
+    settingsFile = fullfile(BpodSystem.Path.DataFolder, selectedSubjectName, selectedProtocolName, 'Session Settings',... 
+    [selectedSettingsName '.mat']);
+else
+    settingsFile = fullfile(BpodSystem.Path.DataFolder, BpodSystem.GUIData.SubjectID, BpodSystem.GUIData.SessionID, 'Session Settings', [selectedSettingsName '.mat']);
+end
 BpodSystem.Path.Settings = settingsFile;
 evalin('base', ['load(''' settingsFile ''')'])
 clc
@@ -732,8 +774,12 @@ targetSettingsPath = [Pathname Filename];
 if ~exist(targetSettingsPath)
     error(['Settings file not found for ' settingsName])
 end
-destinationSettingsPath = fullfile(BpodSystem.Path.DataFolder,selectedSubjectName,selectedProtocolName,...
+if ~isfield(BpodSystem.GUIData,'SessionID') || isempty(BpodSystem.GUIData.SessionID)
+    destinationSettingsPath = fullfile(BpodSystem.Path.DataFolder,selectedSubjectName,selectedProtocolName,...
                           'Session Settings',[ settingsName '.mat']);
+else
+    destinationSettingsPath = fullfile(BpodSystem.Path.DataFolder,BpodSystem.GUIData.SubjectID,BpodSystem.GUIData.SessionID,'Session Settings',[ settingsName '.mat']);
+end
 if (exist(destinationSettingsPath) == 2)
     msgbox(['"' settingsName '"' ' already exists in the target folder. Import aborted.'])
     BpodErrorSound
@@ -756,8 +802,13 @@ subjectName = subjectList{subjectIndex};
 settingsList = get(BpodSystem.GUIHandles.SettingsSelector, 'String');
 settingsIndex = get(BpodSystem.GUIHandles.SettingsSelector,'Value');
 settingsName = settingsList{settingsIndex};
-settingsFileName = fullfile(BpodSystem.Path.DataFolder, subjectName, protocolName, 'Session Settings', [settingsName '.mat']);
-dataFolder = fullfile(BpodSystem.Path.DataFolder,subjectName,protocolName,'Session Data');
+if ~isfield(BpodSystem.GUIData,'SessionID') || isempty(BpodSystem.GUIData.SessionID)
+    settingsFileName = fullfile(BpodSystem.Path.DataFolder, subjectName, protocolName, 'Session Settings', [settingsName '.mat']);
+    dataFolder = fullfile(BpodSystem.Path.DataFolder,subjectName,protocolName,'Session Data');
+else
+    settingsFileName = fullfile(BpodSystem.Path.DataFolder, BpodSystem.GUIData.SubjectID, BpodSystem.GUIData.SessionID, 'Session Settings', [settingsName '.mat']);
+    dataFolder = fullfile(BpodSystem.Path.DataFolder,BpodSystem.GUIData.SubjectID, BpodSystem.GUIData.SessionID,'Session Data');
+end
 if ~exist(dataFolder)
     mkdir(dataFolder);
 end
@@ -850,3 +901,16 @@ outputString = inputString;
 function close_launch_manager(a,b)
 global BpodSystem % Import the global BpodSystem object
 close(BpodSystem.GUIHandles.LaunchManagerFig);
+
+
+function GetSubjectSessionID()
+global BpodSystem
+prompt = {'Subject ID:', 'Session ID:'};
+answer = inputdlg(prompt,'IDs', [1 35], {'',''});
+if any(cellfun(@isempty, answer))
+    BpodSystem.GUIData.SubjectID = [];
+    BpodSystem.GUIData.SessionID = [];
+else
+    BpodSystem.GUIData.SubjectID = answer{1};
+    BpodSystem.GUIData.SessionID = answer{2};
+end
