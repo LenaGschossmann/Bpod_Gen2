@@ -125,7 +125,7 @@ while BpodSystem.Status.InStateMatrix
     if usingBonsai
         OscMsg = UDPCom_read(BpodSystem.BonsaiSocket, 'uint8');
         if ~isempty(OscMsg)
-            BonsaiByte = OscMsg(end);
+            bonsaiByte = OscMsg(end);
             if BpodSystem.EmulatorMode == 0
                 SendBpodSoftCode(bonsaiByte); % Pass the data byte to the state machine
             else
@@ -433,7 +433,8 @@ function handle_soft_code(softCode)
 % Calls the current soft code handler function, passing it the SoftCode
 % received from the state machine
 global BpodSystem
-UDPCom_write(BpodSystem.BonsaiSocketClient, SoftCode)
+UDPCom_write(BpodSystem.BonsaiSocketClient, softCode)
+end
 
 function manualOverrideEvent = virtual_manual_override(overrideMessage)
 % Converts the byte code transmission formatted for the state machine into event codes
@@ -494,8 +495,10 @@ end
 function Msg = UDPCom_read(UDPObj, format)
 sz = pnet(UDPObj,'readpacket', 16, 'noblock');
 Msg = pnet(UDPObj,'read' , sz, format);
+end
 
 function UDPCom_write(UDPObj, Msg)
 Msg = packosc('/Bpod','i', uint8(Msg));
 pnet(UDPObj,'write', Msg, 'uint8');
 pnet(UDPObj, 'writepacket', 'localhost', UDPObj.Port);
+end
