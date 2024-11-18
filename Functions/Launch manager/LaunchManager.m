@@ -390,8 +390,9 @@ if ~isfield(BpodSystem.GUIData,'SessionID') || isempty(BpodSystem.GUIData.Sessio
     [filesep fullfile(localDir, subjectName, protocolName, 'Session Data') filesep],'interpreter','none');
 else
     set(BpodSystem.GUIHandles.DataFilePathDisplay, 'String', [filesep fullfile(localDir, BpodSystem.GUIData.SubjectID, BpodSystem.GUIData.SessionID, 'Session Data') filesep],'interpreter','none');
+    subjectName = [BpodSystem.GUIData.SubjectID '_' BpodSystem.GUIData.SessionID];
 end
-fileName = [subjectName '_' protocolName '_' dateInfo '.mat'];
+fileName = [dateInfo '_' subjectName '_' protocolName '.mat'];
 set(BpodSystem.GUIHandles.DataFileDisplay, 'String', fileName);
 if ~isfield(BpodSystem.GUIData,'SessionID') || isempty(BpodSystem.GUIData.SessionID)
     BpodSystem.Path.CurrentDataFile = fullfile(BpodSystem.Path.DataFolder, subjectName, protocolName, 'Session Data', fileName);
