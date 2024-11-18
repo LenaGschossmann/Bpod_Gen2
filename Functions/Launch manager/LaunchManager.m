@@ -820,8 +820,6 @@ if ~exist(dataFolder)
 end
 if ~exist(settingsFolder)
     mkdir(settingsFolder);
-    add_settings()
-    settingsFileName = BpodSystem.Path.Settings;
 end
 
 % On Bpod r2+, if FlexIO channels are configured as analog,
@@ -846,10 +844,10 @@ BpodSystem.GUIData.ProtocolName = protocolName;
 BpodSystem.GUIData.SubjectName = subjectName;
 BpodSystem.GUIData.SettingsFileName = settingsFileName;
 BpodSystem.Path.Settings = settingsFileName;
-settingStruct = load(BpodSystem.Path.Settings);
-F = fieldnames(settingStruct);
-fieldName = F{1};
-BpodSystem.ProtocolSettings = eval(['settingStruct.' fieldName]);
+% settingStruct = load(BpodSystem.Path.Settings);
+% F = fieldnames(settingStruct);
+% fieldName = F{1};
+% BpodSystem.ProtocolSettings = eval(['settingStruct.' fieldName]);
 BpodSystem.Data = struct;
 if BpodSystem.MachineType > 3
     if nAnalogChannels > 0
