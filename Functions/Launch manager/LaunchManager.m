@@ -809,11 +809,11 @@ else
 end
 if ~isfield(BpodSystem.GUIData,'SessionID') || isempty(BpodSystem.GUIData.SessionID)
     settingsFolder = fullfile(BpodSystem.Path.DataFolder, subjectName, protocolName, 'Session Settings');
-    % settingsFileName = fullfile(settingsFolder, [settingsName '.mat']);
+    settingsFileName = fullfile(settingsFolder, [settingsName '.mat']);
     dataFolder = fullfile(BpodSystem.Path.DataFolder,subjectName,protocolName,'Session Data');
 else
     settingsFolder = fullfile(BpodSystem.Path.DataFolder, BpodSystem.GUIData.SubjectID, BpodSystem.GUIData.SessionID, 'Session Settings');
-    % settingsFileName = fullfile(settingsFolder, [settingsName '.mat']);
+    settingsFileName = fullfile(settingsFolder, [settingsName '.mat']);
     dataFolder = fullfile(BpodSystem.Path.DataFolder,BpodSystem.GUIData.SubjectID, BpodSystem.GUIData.SessionID,'Session Data');
 end
 if ~exist(dataFolder)
