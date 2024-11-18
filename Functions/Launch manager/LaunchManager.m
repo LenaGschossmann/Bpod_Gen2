@@ -801,16 +801,27 @@ subjectIndex = get(BpodSystem.GUIHandles.SubjectSelector,'Value');
 subjectName = subjectList{subjectIndex};
 settingsList = get(BpodSystem.GUIHandles.SettingsSelector, 'String');
 settingsIndex = get(BpodSystem.GUIHandles.SettingsSelector,'Value');
-settingsName = settingsList{settingsIndex};
+if all(cellfun(@isempty,settingsList))
+    settingsName = 'Settings';
+else
+    settingsName = settingsList{settingsIndex};
+end
 if ~isfield(BpodSystem.GUIData,'SessionID') || isempty(BpodSystem.GUIData.SessionID)
-    settingsFileName = fullfile(BpodSystem.Path.DataFolder, subjectName, protocolName, 'Session Settings', [settingsName '.mat']);
+    settingsFolder = fullfile(BpodSystem.Path.DataFolder, subjectName, protocolName, 'Session Settings');
+    % settingsFileName = fullfile(settingsFolder, [settingsName '.mat']);
     dataFolder = fullfile(BpodSystem.Path.DataFolder,subjectName,protocolName,'Session Data');
 else
-    settingsFileName = fullfile(BpodSystem.Path.DataFolder, BpodSystem.GUIData.SubjectID, BpodSystem.GUIData.SessionID, 'Session Settings', [settingsName '.mat']);
+    settingsFolder = fullfile(BpodSystem.Path.DataFolder, BpodSystem.GUIData.SubjectID, BpodSystem.GUIData.SessionID, 'Session Settings');
+    % settingsFileName = fullfile(settingsFolder, [settingsName '.mat']);
     dataFolder = fullfile(BpodSystem.Path.DataFolder,BpodSystem.GUIData.SubjectID, BpodSystem.GUIData.SessionID,'Session Data');
 end
 if ~exist(dataFolder)
     mkdir(dataFolder);
+end
+if ~exist(settingsFolder)
+    mkdir(settingsFolder);
+    add_settings()
+    settingsFileName = BpodSystem.Path.Settings;
 end
 
 % On Bpod r2+, if FlexIO channels are configured as analog,
